@@ -44,6 +44,10 @@
     "lib/markdown.js",
     "lib/time.js",
     "cordis.patch.yml",
+    "install.sh",
+    "uninstall.sh",
+    "install.ps1",
+    "uninstall.ps1",
     "icon.svg",
     "README.md",
     "LICENSE"

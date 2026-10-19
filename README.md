@@ -148,15 +148,37 @@
 
 ### 安装
 
+**macOS / Linux**
+
 ```sh
 git clone https://github.com/LuoX218/dsh-siyuan.git
 cd dsh-siyuan
 ./install.sh
 ```
 
-重启 Harness，在 **设置 → 插件 → 第三方插件** 里能看到 `dsh-siyuan`。
+**Windows**（PowerShell）
 
-**思源必须开着**——插件通过思源内核 API 写入，token 从 `conf/conf.json` 自动读取。
+```powershell
+git clone https://github.com/LuoX218/dsh-siyuan.git
+cd dsh-siyuan
+.\install.ps1
+```
+
+Windows 脚本用**目录联接**（Junction）代替符号链接，不需要管理员权限。
+
+装完重启 Harness，在 **设置 → 插件 → 第三方插件** 里能看到 `dsh-siyuan`。
+
+**思源必须开着**——插件通过思源内核 API 写入，token 从 `conf/conf.json` 自动读取（macOS / Windows / Linux 路径都已适配）。
+
+#### 平台支持
+
+| 系统 | 状态 | 说明 |
+| :--- | :---: | :--- |
+| macOS | ✅ | 已充分测试 |
+| Windows | ✅ | 安装脚本已提供，代码路径全平台适配 |
+| Linux | ✅ | 使用 `~/.config/siyuan/conf/conf.json` |
+
+代码只用 Node 内置模块，路径拼接统一走 `path.join`，不调用任何 shell 命令。
 
 ### 设置面板
 
@@ -313,15 +335,33 @@ Right-click any message:
 
 ### Install
 
+**macOS / Linux**
+
 ```sh
 git clone https://github.com/LuoX218/dsh-siyuan.git
 cd dsh-siyuan
 ./install.sh
 ```
 
+**Windows** (PowerShell)
+
+```powershell
+git clone https://github.com/LuoX218/dsh-siyuan.git
+cd dsh-siyuan
+.\install.ps1
+```
+
+The Windows script uses a directory junction instead of a symlink, so no admin rights are needed.
+
 Restart Harness; the plugin appears under **Settings → Plugins → Third-party plugins**.
 
-**SiYuan must be running** — writes go through its kernel API, with the token read from `conf/conf.json`.
+**SiYuan must be running** — writes go through its kernel API, with the token read from `conf/conf.json` (macOS / Windows / Linux paths all handled).
+
+| Platform | Status | Notes |
+| :--- | :---: | :--- |
+| macOS | ✅ | Fully tested |
+| Windows | ✅ | Install script provided; all code paths adapted |
+| Linux | ✅ | Uses `~/.config/siyuan/conf/conf.json` |
 
 ### Settings
 
