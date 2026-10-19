@@ -12,3 +12,4 @@ dist/
 .dsh-ops-update-*.lock
 __tmp_*.mjs
 *.tmp
+push.sh

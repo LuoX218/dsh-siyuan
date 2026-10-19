@@ -4,6 +4,7 @@
   "description": "把 DeepSeek Harness 的对话一键存入思源笔记（SiYuan）。支持单条/本轮/整窗口同步、AI 摘要、公式与 mermaid 图表原样保留；思源未运行时自动排队补写。",
   "type": "module",
   "license": "MIT",
+  "icon": "icon.svg",
   "author": "LuoX218",
   "repository": {
     "type": "git",
@@ -43,6 +44,7 @@
     "lib/markdown.js",
     "lib/time.js",
     "cordis.patch.yml",
+    "icon.svg",
     "README.md",
     "LICENSE"
   ],
@@ -54,6 +56,11 @@
       "platform": "web",
       "inject": []
     },
-    "manifestVersion": 1
+    "manifestVersion": 1,
+    "compatibility": {
+      "dshReleases": {
+        "0.2.1-rc.2": "compatible"
+      }
+    }
   }
 }
