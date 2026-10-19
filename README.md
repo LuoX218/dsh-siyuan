@@ -37,9 +37,24 @@
 
 ### 效果预览
 
-<span>同步后在思源里的实际渲染效果。</span>
+下面全部是**从 DeepSeek Harness 对话框右键同步过去之后**，在思源笔记里的原始截图——没有手动排版，没有二次编辑。
 
-**文本样式与标题** —— 粗体、斜体、删除线、行内代码、超链接、中文标点全部保留
+对话里写什么，笔记里就是什么：Markdown 语法、LaTeX 公式、mermaid 图表、代码块、表格，全部按思源的块模型重新组织，而不是变成一堆纯文本。
+
+<span>兼容性一览：</span>
+
+| Harness 里的写法 | 同步后成为 | 是否丢格式 |
+| :--- | :--- | :---: |
+| `**粗体**` `*斜体*` `~~删除线~~` | 思源对应的行内样式 | ✅ 完整保留 |
+| `$E=mc^2$` | 思源行内公式 `NodeMathInline` | ✅ 可编辑 |
+| `$$...$$` | 思源公式块 `NodeMathBlock` | ✅ 可编辑 |
+| ```mermaid flowchart | 思源图表块（可缩放） | ✅ 可交互 |
+| ```javascript | 思源代码块 + 语法高亮 | ✅ 语言标记都保留 |
+| Markdown 表格 | 思源表格块 | ✅ 对齐方式保留 |
+| `- [x] 任务` | 思源任务列表块 | ✅ 可勾选 |
+| 无序/有序列表 | 思源列表块（含嵌套） | ✅ 层级保留 |
+
+**文本样式与标题** —— 对话里怎么写，笔记里就怎么显示。粗体、斜体、删除线、行内代码、超链接、中文标点全部原样保留，不是转成纯文本后重新加粗的
 
 <div align="center">
   <img src="assets/01-text.png" alt="标题层级与文本样式" width="820" />
@@ -47,7 +62,7 @@
   <sub>标题层级与文本样式</sub>
 </div>
 
-**公式** —— 行内公式、块级公式、多行对齐、矩阵，全部渲染成思源原生公式块
+**公式** —— 对话里写的 LaTeX 直接变成思源公式块，点一下就能继续编辑。行内、块级、多行对齐、矩阵都支持
 
 <div align="center">
   <img src="assets/02-math.png" alt="公式渲染" width="820" />
@@ -55,7 +70,7 @@
   <sub>公式渲染</sub>
 </div>
 
-**流程图** —— 自动识别 mermaid，渲染成可交互的图形
+**流程图** —— 对话里是 ```mermaid 代码块，同步后思源自动识别并渲染成图形，不是一段代码
 
 <div align="center">
   <img src="assets/03-flowchart.png" alt="流程图" width="820" />
@@ -63,7 +78,7 @@
   <sub>流程图</sub>
 </div>
 
-**时序图** —— 多方交互、请求响应顺序一目了然
+**时序图** —— 多方交互和请求响应顺序，同步后保留全部结构
 
 <div align="center">
   <img src="assets/04-sequence.png" alt="时序图" width="820" />
@@ -71,7 +86,7 @@
   <sub>时序图</sub>
 </div>
 
-**甘特图与饼图** —— 排期用甘特，占比用饼图
+**甘特图与饼图** —— 同一个对话里两种图都能识别，各按各的类型渲染
 
 <div align="center">
   <img src="assets/05-gantt-pie.png" alt="甘特图与饼图" width="820" />
@@ -79,7 +94,7 @@
   <sub>甘特图与饼图</sub>
 </div>
 
-**思维导图** —— 层级结构自动展开
+**思维导图** —— 对话里写的 mindmap 层级结构，同步后自动展开成树
 
 <div align="center">
   <img src="assets/06-mindmap.png" alt="思维导图" width="820" />
@@ -87,7 +102,7 @@
   <sub>思维导图</sub>
 </div>
 
-**代码块** —— 按语言高亮，缩进和注释完整
+**代码块** —— 语言标记（图里左上角的 `javascript`）都是同步时自动带过去的，缩进、注释、中文注释全部保留
 
 <div align="center">
   <img src="assets/07-code.png" alt="代码块高亮" width="820" />
@@ -95,7 +110,7 @@
   <sub>代码块高亮</sub>
 </div>
 
-**表格** —— 对齐方式保留，状态标记正常显示
+**表格** —— Markdown 表格转成思源表格块，左中右对齐都能保留
 
 <div align="center">
   <img src="assets/08-table.png" alt="表格与对齐" width="820" />
@@ -103,7 +118,7 @@
   <sub>表格与对齐</sub>
 </div>
 
-**特殊符号** —— 箭头、数学符号、Emoji 都能正确显示
+**特殊符号** —— 箭头、数学符号、单位、Emoji、长字符串，同步过程不做任何转义或替换
 
 <div align="center">
   <img src="assets/09-symbols.png" alt="特殊符号与 Emoji" width="820" />
@@ -193,7 +208,19 @@ SiYuan isn't a backup drive here; it's the organization layer: backlinks, outlin
 
 ### Screenshots
 
-<span>How synced content renders inside SiYuan.</span>
+Every image below is a <strong>raw screenshot of SiYuan</strong> after right-clicking sync in a DeepSeek Harness conversation — no manual formatting, no re-editing.
+
+What you type in the chat is what lands in the note: Markdown, LaTeX, mermaid, code fences, tables — all rebuilt as SiYuan's native blocks instead of flattened into plain text.
+
+| Written in Harness | Becomes in SiYuan | Fidelity |
+| :--- | :--- | :---: |
+| `**bold**` `*italic*` `~~strike~~` | matching inline styles | ✅ |
+| `$E=mc^2$` | inline math `NodeMathInline` | ✅ editable |
+| `$$...$$` | math block `NodeMathBlock` | ✅ editable |
+| ```mermaid flowchart | diagram block | ✅ interactive |
+| ```javascript | code block with highlighting | ✅ language marker kept |
+| Markdown table | table block | ✅ alignment kept |
+| `- [x] task` | task list block | ✅ checkable |
 
 <div align="center">
   <img src="assets/02-math.png" alt="Formulas" width="820" />
