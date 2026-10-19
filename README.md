@@ -148,23 +148,32 @@
 
 ### 安装
 
-**方式一：npm（推荐）**
+两种方式，任选其一。装完都要**重启 Harness**。
+
+#### 方式一：npm（推荐，最省事）
+
+不依赖 Git，一条命令搞定：
 
 ```sh
 dsh plugin --profile desktop add dsh-siyuan-sync
 ```
 
-一条命令装完，自动处理依赖和版本，无需 clone 仓库。需要机器上已有 pnpm。
+> 需要机器上已装 pnpm。如果提示 `pnpm was not found`，先装：`npm i -g pnpm`
 
-**方式二：从 GitHub 克隆**
+#### 方式二：从 GitHub 克隆
+
+适合想改代码、或者 npm 装不上的情况。
+
+**macOS / Linux**
 
 ```sh
 git clone https://github.com/LuoX218/dsh-siyuan.git
 cd dsh-siyuan
+chmod +x install.sh
 ./install.sh
 ```
 
-**Windows**（PowerShell）
+**Windows（PowerShell）**
 
 ```powershell
 git clone https://github.com/LuoX218/dsh-siyuan.git
@@ -172,11 +181,61 @@ cd dsh-siyuan
 .\install.ps1
 ```
 
-Windows 脚本用**目录联接**（Junction）代替符号链接，不需要管理员权限。
+> PowerShell 若提示「禁止运行脚本」，先执行一次：
+> `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`
 
-装完重启 Harness，在 **设置 → 插件 → 第三方插件** 里能看到 `dsh-siyuan`。
+Windows 脚本用**目录联接**（Junction）代替符号链接，**不需要管理员权限**。
 
-> npm 包地址：https://www.npmjs.com/package/dsh-siyuan-sync
+#### 安装脚本做了什么
+
+三个改动，都在 `~/.dsh/profiles/desktop/` 下：
+
+1. 把插件目录链接到 `node_modules/`
+2. 写进 `package.json` 的 `dependencies`
+3. 追加到 `dsh.profile.bundles`
+
+第 2、3 步是插件能出现在「设置 → 插件 → 第三方插件」列表里的关键。脚本会自动备份 `package.json`。
+
+其他 profile 用 `--profile <名字>` 指定（Windows 用 `-Profile <名字>`）。
+
+#### 装完确认
+
+重启 Harness 后：
+
+- **设置 → 插件 → 第三方插件** 里能看到 `dsh-siyuan`，可以启用/停用
+- 右键任意对话消息，菜单里出现「同步这条消息到思源」
+
+#### 卸载
+
+**macOS / Linux**
+
+```sh
+./uninstall.sh
+```
+
+**Windows**
+
+```powershell
+.\uninstall.ps1
+```
+
+#### 更新
+
+npm 方式：
+
+```sh
+dsh plugin --profile desktop add dsh-siyuan-sync@latest
+```
+
+克隆方式：
+
+```sh
+cd dsh-siyuan
+git pull
+./uninstall.sh && ./install.sh
+```
+
+#### 前置条件
 
 **思源必须开着**——插件通过思源内核 API 写入，token 从 `conf/conf.json` 自动读取（macOS / Windows / Linux 路径都已适配）。
 
@@ -345,23 +404,32 @@ Right-click any message:
 
 ### Install
 
-**Option 1: npm (recommended)**
+Two options. Either way, **restart Harness** afterwards.
+
+#### Option 1: npm (recommended)
+
+No Git needed, one command:
 
 ```sh
 dsh plugin --profile desktop add dsh-siyuan-sync
 ```
 
-One command, no cloning. Requires pnpm on your machine.
+> Requires pnpm. If you see `pnpm was not found`, install it first: `npm i -g pnpm`
 
-**Option 2: clone from GitHub**
+#### Option 2: clone from GitHub
+
+For hacking on the code, or when npm isn't an option.
+
+**macOS / Linux**
 
 ```sh
 git clone https://github.com/LuoX218/dsh-siyuan.git
 cd dsh-siyuan
+chmod +x install.sh
 ./install.sh
 ```
 
-**Windows** (PowerShell)
+**Windows (PowerShell)**
 
 ```powershell
 git clone https://github.com/LuoX218/dsh-siyuan.git
@@ -369,11 +437,63 @@ cd dsh-siyuan
 .\install.ps1
 ```
 
-The Windows script uses a directory junction instead of a symlink, so no admin rights are needed.
+> If PowerShell refuses to run the script:
+> `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`
 
-Restart Harness; the plugin appears under **Settings → Plugins → Third-party plugins**.
+The Windows script uses a **directory junction** instead of a symlink, so **no admin rights are needed**.
 
-**SiYuan must be running** — writes go through its kernel API, with the token read from `conf/conf.json` (macOS / Windows / Linux paths all handled).
+#### What the script does
+
+Three changes, all under `~/.dsh/profiles/desktop/`:
+
+1. Links the plugin directory into `node_modules/`
+2. Adds it to `package.json` → `dependencies`
+3. Appends it to `dsh.profile.bundles`
+
+Steps 2 and 3 are what make the plugin show up under **Settings → Plugins → Third-party plugins**. Your `package.json` is backed up automatically.
+
+For another profile, pass `--profile <name>` (Windows: `-Profile <name>`).
+
+#### Verifying
+
+After restarting Harness:
+
+- The plugin appears under **Settings → Plugins → Third-party plugins**, with an enable/disable toggle
+- Right-clicking any conversation message shows "Sync this message"
+
+#### Uninstall
+
+**macOS / Linux**
+
+```sh
+./uninstall.sh
+```
+
+**Windows**
+
+```powershell
+.\uninstall.ps1
+```
+
+#### Updating
+
+npm install:
+
+```sh
+dsh plugin --profile desktop add dsh-siyuan-sync@latest
+```
+
+Clone install:
+
+```sh
+cd dsh-siyuan
+git pull
+./uninstall.sh && ./install.sh
+```
+
+#### Requirement
+
+**SiYuan must be running** — the plugin writes through its kernel API, reading the token from `conf/conf.json` (macOS / Windows / Linux paths all handled).
 
 | Platform | Status | Notes |
 | :--- | :---: | :--- |
