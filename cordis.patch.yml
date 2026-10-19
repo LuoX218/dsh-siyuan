@@ -1,0 +1,10 @@
+# dsh-siyuan-sync bundle patch
+#
+# 挂载方式：本包被 profile 以 bundle 形式引用时，这一层只做一件事 ——
+# 把插件行插入 loader 树。id 固定为 siyuan-sync，重复挂载会由 loader 直接报错，
+# 因此下面的 disabled 表达式做了一次同包去重：若已有别的 entry 挂载同名包，
+# 这一行自动让位，避免「duplicate factory registration」让整页白屏。
+- insert:
+    - id: siyuan-sync
+      name: "dsh-siyuan-sync"
+      disabled: !!js "[...ctx.loader.entries()].some((e) => e.options.name === 'dsh-siyuan-sync' && e.options.id !== 'siyuan-sync' && !e.disabled)"

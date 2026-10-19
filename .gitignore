@@ -1,0 +1,14 @@
+# 依赖与构建产物
+node_modules/
+dist/
+*.log
+
+# 编辑器与系统
+.DS_Store
+.vscode/
+.idea/
+
+# 工具临时文件
+.dsh-ops-update-*.lock
+__tmp_*.mjs
+*.tmp
