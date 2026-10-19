@@ -148,7 +148,15 @@
 
 ### 安装
 
-**macOS / Linux**
+**方式一：npm（推荐）**
+
+```sh
+dsh plugin --profile desktop add dsh-siyuan-sync
+```
+
+一条命令装完，自动处理依赖和版本，无需 clone 仓库。需要机器上已有 pnpm。
+
+**方式二：从 GitHub 克隆**
 
 ```sh
 git clone https://github.com/LuoX218/dsh-siyuan.git
@@ -167,6 +175,8 @@ cd dsh-siyuan
 Windows 脚本用**目录联接**（Junction）代替符号链接，不需要管理员权限。
 
 装完重启 Harness，在 **设置 → 插件 → 第三方插件** 里能看到 `dsh-siyuan`。
+
+> npm 包地址：https://www.npmjs.com/package/dsh-siyuan-sync
 
 **思源必须开着**——插件通过思源内核 API 写入，token 从 `conf/conf.json` 自动读取（macOS / Windows / Linux 路径都已适配）。
 
@@ -335,7 +345,15 @@ Right-click any message:
 
 ### Install
 
-**macOS / Linux**
+**Option 1: npm (recommended)**
+
+```sh
+dsh plugin --profile desktop add dsh-siyuan-sync
+```
+
+One command, no cloning. Requires pnpm on your machine.
+
+**Option 2: clone from GitHub**
 
 ```sh
 git clone https://github.com/LuoX218/dsh-siyuan.git
