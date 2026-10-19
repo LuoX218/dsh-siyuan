@@ -157,14 +157,64 @@ cd dsh-siyuan
 
 **思源必须开着**——插件通过思源内核 API 写入，token 从 `conf/conf.json` 自动读取。
 
-### 设置项
+### 设置面板
 
-设置 → 插件 → dsh-siyuan：
+入口：**设置 → 插件 → 第三方插件 → dsh-siyuan**，点「配置」。
 
-- **存放规则** —— 目标笔记本、日期格式、归类方式、时间标题级别
-- **排版** —— 段落分隔线、时间戳、图表配色、自动标签开关
-- **摘要** —— 是否先问摘要、摘要提示词（可完全自定义）
-- **行为** —— 写入前预览、重复内容提醒
+面板顶部显示连接状态（思源是否可达、版本号），下面是四组设置。
+
+#### 存放规则
+
+决定内容写到哪、怎么组织。
+
+| 设置项 | 选项 | 说明 |
+| --- | --- | --- |
+| **目标笔记本** | 任意名字 | 填不存在的名字会自动创建。想按主题分类就填 `架构决策`、`问题排查` |
+| **日期格式** | `2026-10-20` / `2026/10/20` / `2026年10月20日` | 只影响文档标题和存放路径 |
+| **归类方式** | 同一天追加一篇 / 每次新建文档 | 前者适合日记式归档，后者适合每次同步都是独立主题 |
+| **每段时间标题** | 不添加 / 二级 / 三级 / 四级 | 每段内容开头那个时间戳的标题级别。三级适中，不添加则不显示时间 |
+
+面板里会实时显示「存放位置：xxx / xxx」，改完立刻能看到最终路径。
+
+#### 排版
+
+控制同步过去的 Markdown 长什么样。
+
+| 设置项 | 选项 | 说明 |
+| --- | --- | --- |
+| **段落之间的分隔线** | 显示（推荐）/ 不显示 | 每次同步之间插一条 `---`，多次同步视觉上分得开 |
+| **每段显示时间戳** | 显示 / 不显示 | 关掉后只保留正文，适合连续记录同一主题 |
+| **流程图 / 图表配色** | 跟随思源 / 强制浅色 / 强制深色 / 高对比 | mermaid 的配色方案。夜间看不清时改「强制深色」或「高对比」 |
+| **自动标签** | 按内容自动加标签 / 不加标签 | 命中关键词时在正文前插 `#方案设计#` 这类标签 |
+
+#### 摘要
+
+只在同步整个窗口时生效。
+
+| 设置项 | 选项 / 说明 |
+| --- | --- |
+| **整窗口同步时** | 「先问是否提取摘要」会弹选择框；「直接存全文」跳过提问 |
+| **提取摘要的提示词** | 多行文本框，可完全自定义。**留空则用内置模板**（概览 / 时间线 / 主要工作 / 关键信息 / 问题与解决 / 图文 / 后续，并要求配 gantt、flowchart、pie 等图表） |
+
+提示词失焦自动保存。想强制某种输出格式，直接在里面写就行，比如「每次都要有饼图」。
+
+#### 行为
+
+| 设置项 | 选项 | 说明 |
+| --- | --- | --- |
+| **写入前预览** | 先预览再写入 / 直接写入 | 预览面板里可以改标题和正文，确认后才写。觉得多余就关掉 |
+| **重复内容提醒** | 已存过时提示我 / 不检查直接存 | 按内容指纹判断，避免同一段内容反复堆积 |
+
+#### 队列管理
+
+面板下半部分是待写入队列，每条显示标题、字数、相对时间、重试次数和失败原因。
+
+- **重试** —— 单独补写这一条
+- **删除** —— 不要了
+- **立即写入 N 条** —— 队列整体补写
+- **重新检测** —— 重新探测思源地址
+
+失败原因分四类：`offline`（思源没开）、`auth`（token 失效）、`missing`（目标文档被删，会自动重建）、`other`（其他错误，附原始信息）。
 
 ### 已知限制
 
@@ -270,6 +320,20 @@ cd dsh-siyuan
 Restart Harness; the plugin appears under **Settings → Plugins → Third-party plugins**.
 
 **SiYuan must be running** — writes go through its kernel API, with the token read from `conf/conf.json`.
+
+### Settings
+
+Open via **Settings → Plugins → Third-party plugins → dsh-siyuan → Configure**. The panel header shows connection status; four groups follow.
+
+**Storage** — target notebook (created on demand), date format, grouping mode (one note per day vs. one per sync), timestamp heading level.
+
+**Layout** — separator between segments, timestamp visibility, mermaid color scheme (follow theme / force light / force dark / high contrast), auto-tagging on or off.
+
+**Summary** — whether whole-window syncs ask before summarizing, and a fully customizable summary prompt (leave empty for the built-in archival template).
+
+**Behavior** — preview before writing, duplicate detection.
+
+The queue section at the bottom lists pending entries with retry counts and failure reasons, each individually retryable or removable.
 
 ### Known limitations
 
