@@ -1,6 +1,6 @@
 # dsh-siyuan
 
-**把 DeepSeek Harness 和思源笔记接通，让对话沉淀成你自己的知识库。** 一次右键，对话就变成可双链、可检索、可打标签的正式笔记；格式不丢，公式和 mermaid 图表原样变成思源原生块。再借助思源自带的云同步 / S3 / WebDAV，所有设备上都能看到同一份内容。
+**把 DeepSeek Harness 里值得留下的东西，挑出来沉淀成你自己的开发知识库。** 对话很长，但不是每句都有价值——右键选中那一段，它就成了思源里可双链、可检索、可打标签的正式笔记；格式不丢，公式和 mermaid 图表原样变成思源原生块。
 
 [中文](#中文) · [English](#english)
 
@@ -10,19 +10,55 @@
 
 ### 为什么需要它
 
-Harness 里的对话跑完就散了——翻历史记录能找到，但很快被新会话淹没。真正有价值的结论、踩过的坑、改过的参数，往往过两天就找不回来。
+一次开发对话动辄几千字。里面真正值得留下的，可能就那么几段：一个想通了的方案、一个踩了半天的坑、一组调出来的参数。剩下的推演、试错、来回确认——再过一周你也不会想重读。
 
-把 Harness 和思源接起来，这件事就变成了**知识库**的一部分：
+问题是这些碎片都埋在长长的对话里。要么整段存下来（很快就懒得翻），要么什么都不存（下次重新踩一遍）。
 
-- **对话沉淀成笔记。** 不再是「某天某次会话里的某句话」，而是可以双链、可以打标签、可以被检索的正式笔记。写方案时能链回当初的推导过程，查问题能翻到上次怎么解决的。
-- **思源负责组织，Harness 负责生产。** 思源的双链、大纲、数据库视图、标签体系都是现成的知识管理工具，不用另找。插件只做一件事：把产出送进去，格式不丢。
-- **多端同步免费搭车。** 思源自带云同步和 S3/WebDAV 备份，笔记库同步到你所有设备。也就是说，你在 Mac 上跟 Harness 聊出来的内容，手机上打开思源就能看。不需要再搭一套同步服务。
+这个插件解决的是**挑选**这件事：
 
-手动复制粘贴做不到这些——格式全丢、代码块散架、公式变乱码。这个插件把这件事变成右键一下。
+- **你决定存什么。** 可以是完整的一轮问答，也可以只是某条把问题讲清楚了的消息。对话内容本身不做全量搬运，你选中的才进笔记库。
+- **进来的部分是能用的。** 结论、代码、公式、图表都保持原样，不是一堆缩进错乱的纯文本。在思源里能被双链、被标签聚合、被全文检索。
+- **慢慢长成你自己的知识库。** 今天存一段方案推导，明天存一个排查结论。几个月后想找「上次那个内存泄漏是怎么定的」，搜一下就有了——比翻聊天记录快得多。
 
-### 和思源云同步的关系
+思源在这套流程里扮演的不是「备份盘」，而是**组织层**：双链、大纲、数据库视图、标签体系都是现成的。插件只负责把挑选出来的内容送进去，格式一点不丢。
 
-插件本身**不负责同步**，只负责把内容写进思源的本地笔记库。之后的跨设备分发交给思源自己：
+手动复制粘贴做不到这些——格式全丢、代码块散架、公式变乱码。
+
+### 怎么把它用成知识库
+
+插件本身不规定你怎么组织，但下面这套用法能很快跑出效果：
+
+**1. 按主题建笔记本，别按时间堆**
+
+默认的 `deepseek对话` 只是开箱设定，不是必须。改成分主题：`架构决策`、`问题排查`、`性能优化`、`踩坑记录`。时间戳保留在段落里，笔记本按主题分类——以后找东西是按「我在想什么」找，不是按「我哪天聊的」找。
+
+**2. 同步粒度按价值选**
+
+| 场景 | 用哪个 |
+|---|---|
+| 结论就一句话 | 同步这条消息 |
+| 一问一答讲清了一个问题 | 同步本轮对话 |
+| 一整段推演过程，想完整保留 | 同步整个窗口 + 摘要 |
+
+大多数时候「本轮对话」够用。整窗口配合摘要，适合那种推了很久才想通的复杂问题。
+
+**3. 摘要当索引，全文当附录**
+
+整窗口同步生成的摘要会先把结论、根因、关键参数摘出来放在前面。日常翻笔记看摘要就够了，需要细节再往下拉到全文。
+
+**4. 用标签和双链串起来**
+
+插件会自动打 `#方案设计#`、`#问题排查#` 这类标签。之后再手动补双链——把「当时定的方案」和「后来踩的坑」连起来，知识库才真正成型。
+
+**5. 定期整理**
+
+过一段时间回头看，把散的段落合并成整篇文档，删掉过时的。插件负责把原料送进来，提炼和归档还是得自己来。
+
+### 关于多端同步
+
+如果希望这些笔记在手机上也能看，思源自带几种方案：
+
+> 插件本身不参与同步，只负责把内容写进本地笔记库。写完之后由思源的同步引擎接管——分块、冲突处理、版本历史都和手动编辑的笔记完全一致。
 
 | 方式 | 配置位置 | 说明 |
 |---|---|---|
@@ -196,23 +232,59 @@ MIT
 
 ## English
 
-**Connect DeepSeek Harness to SiYuan Notes and turn conversations into a knowledge base of your own.** One right click makes a conversation a proper note — linkable, searchable, taggable — with no formatting loss: formulas and mermaid diagrams become native SiYuan blocks. Combined with SiYuan's built-in cloud sync, S3, or WebDAV, the same content shows up on every device you own.
+**Pick out what's worth keeping from DeepSeek Harness and grow it into your own development knowledge base.** Conversations are long, but not every line matters — right-click the part that does, and it becomes a proper SiYuan note you can backlink, search, and tag. Formatting survives intact: formulas and mermaid diagrams land as native SiYuan blocks.
 
 ### Why
 
-Harness conversations scatter once they end. The conclusions, the bugs you hit, the parameters you tuned — all of it gets buried under new sessions within days.
+A single development conversation easily runs thousands of words. What's actually worth keeping might be a few paragraphs: a design that finally clicked, a bug that ate an afternoon, a set of parameters you tuned into place. The rest — the false starts, the back-and-forth — you won't want to reread next week.
 
-Wiring Harness to SiYuan turns that into a knowledge base:
+The problem is those fragments are buried in the middle of everything else. Save the whole transcript and you'll never open it again; save nothing and you'll rediscover the same bug next month.
 
-- **Conversations become notes.** Not "some sentence in a session on some day", but real notes you can backlink, tag, and search. Cite the reasoning behind a decision; find how you fixed that issue last time.
-- **SiYuan organizes, Harness produces.** Backlinks, outlining, database views, and tagging are already there. The plugin does one job: get the output in without losing structure.
-- **Multi-device sync comes for free.** SiYuan ships cloud sync and S3/WebDAV backup. Chat on your Mac, read it in SiYuan on your phone. No separate sync service to build.
+This plugin is about **selection**:
+
+- **You decide what's kept.** A full turn, or just the one message that explained the problem. Nothing is archived wholesale — only what you pick lands in the library.
+- **What lands is usable.** Conclusions, code, formulas, and diagrams keep their structure. Not a wall of mangled plain text. Linkable, taggable, searchable in SiYuan.
+- **It compounds into a knowledge base.** A design rationale today, a debugging conclusion tomorrow. Months later, "how did we pin down that memory leak" is a search away — faster than scrolling chat history.
+
+SiYuan isn't a backup drive here; it's the **organization layer**. Backlinks, outlining, database views, and tagging are already built in. The plugin just delivers the curated pieces without losing fidelity.
 
 Copying by hand can't do any of this — formatting is lost, code fences break, formulas mangle.
 
-### Relationship to SiYuan sync
+### Using it as a knowledge base
 
-The plugin does **not** sync anything. It writes into SiYuan's local library; distribution across devices is SiYuan's job:
+The plugin doesn't dictate structure, but this approach gets results quickly:
+
+**1. Notebooks by topic, not by date**
+
+`deepseek对话` is a default, not a requirement. Rename it to `architecture`、`debugging`、`performance`、`gotchas`. Timestamps stay inside the segments; the notebook reflects what you were thinking about, not when you talked.
+
+**2. Match sync scope to value**
+
+| Situation | Use |
+|---|---|
+| The conclusion is one message | Sync this message |
+| One exchange settled a question | Sync this turn |
+| A long derivation worth keeping whole | Sync the whole window + summary |
+
+"Sync this turn" covers most cases. Whole-window plus summary suits problems that took a while to crack.
+
+**3. Summary as index, transcript as appendix**
+
+Whole-window summaries lead with conclusions, root causes, and key parameters. Read the summary day to day; drop into the transcript when you need detail.
+
+**4. Tie it together with tags and backlinks**
+
+The plugin tags segments automatically (`#design#`, `#troubleshooting#`). Add backlinks by hand — connect "the plan we settled on" to "the bug we hit later" — and it starts acting like a knowledge base.
+
+**5. Prune occasionally**
+
+Every few weeks, merge scattered segments into proper documents and drop what's outdated. The plugin delivers raw material; distillation is still on you.
+
+### About multi-device sync
+
+If you want these notes on your phone, SiYuan has you covered:
+
+> The plugin doesn't sync anything. It writes into the local library; from there SiYuan's sync engine takes over — chunking, conflict handling, and version history behave exactly as they do for manually edited notes.
 
 | Method | Where | Notes |
 |---|---|---|
