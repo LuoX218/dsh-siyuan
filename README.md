@@ -35,6 +35,82 @@
 - **AI 摘要** —— 整窗口同步时可调用当前模型生成结构化摘要，再连同全文一起存入
 - **失败重试** —— 自动退避重试，面板里能看到失败原因
 
+### 效果预览
+
+<span>同步后在思源里的实际渲染效果。</span>
+
+**文本样式与标题** —— 粗体、斜体、删除线、行内代码、超链接、中文标点全部保留
+
+<div align="center">
+  <img src="assets/01-text.png" alt="标题层级与文本样式" width="820" />
+  <br>
+  <sub>标题层级与文本样式</sub>
+</div>
+
+**公式** —— 行内公式、块级公式、多行对齐、矩阵，全部渲染成思源原生公式块
+
+<div align="center">
+  <img src="assets/02-math.png" alt="公式渲染" width="820" />
+  <br>
+  <sub>公式渲染</sub>
+</div>
+
+**流程图** —— 自动识别 mermaid，渲染成可交互的图形
+
+<div align="center">
+  <img src="assets/03-flowchart.png" alt="流程图" width="820" />
+  <br>
+  <sub>流程图</sub>
+</div>
+
+**时序图** —— 多方交互、请求响应顺序一目了然
+
+<div align="center">
+  <img src="assets/04-sequence.png" alt="时序图" width="820" />
+  <br>
+  <sub>时序图</sub>
+</div>
+
+**甘特图与饼图** —— 排期用甘特，占比用饼图
+
+<div align="center">
+  <img src="assets/05-gantt-pie.png" alt="甘特图与饼图" width="820" />
+  <br>
+  <sub>甘特图与饼图</sub>
+</div>
+
+**思维导图** —— 层级结构自动展开
+
+<div align="center">
+  <img src="assets/06-mindmap.png" alt="思维导图" width="820" />
+  <br>
+  <sub>思维导图</sub>
+</div>
+
+**代码块** —— 按语言高亮，缩进和注释完整
+
+<div align="center">
+  <img src="assets/07-code.png" alt="代码块高亮" width="820" />
+  <br>
+  <sub>代码块高亮</sub>
+</div>
+
+**表格** —— 对齐方式保留，状态标记正常显示
+
+<div align="center">
+  <img src="assets/08-table.png" alt="表格与对齐" width="820" />
+  <br>
+  <sub>表格与对齐</sub>
+</div>
+
+**特殊符号** —— 箭头、数学符号、Emoji 都能正确显示
+
+<div align="center">
+  <img src="assets/09-symbols.png" alt="特殊符号与 Emoji" width="820" />
+  <br>
+  <sub>特殊符号与 Emoji</sub>
+</div>
+
 ### 怎么用
 
 右键任意消息：
@@ -114,6 +190,36 @@ SiYuan isn't a backup drive here; it's the organization layer: backlinks, outlin
 - **Duplicate detection** — the same content prompts before being saved twice
 - **AI summary** — for whole-window syncs, call your current model for a structured summary alongside the transcript
 - **Retry with backoff** — failure reasons surface in the panel
+
+### Screenshots
+
+<span>How synced content renders inside SiYuan.</span>
+
+<div align="center">
+  <img src="assets/02-math.png" alt="Formulas" width="820" />
+  <br>
+  <sub>Inline and block formulas become native SiYuan math blocks</sub>
+</div>
+
+<div align="center">
+  <img src="assets/03-flowchart.png" alt="Flowchart" width="820" />
+  <br>
+  <sub>Mermaid flowcharts render as interactive diagrams</sub>
+</div>
+
+<div align="center">
+  <img src="assets/05-gantt-pie.png" alt="Gantt and pie" width="820" />
+  <br>
+  <sub>Gantt charts for schedules, pie charts for proportions</sub>
+</div>
+
+<div align="center">
+  <img src="assets/08-table.png" alt="Tables" width="820" />
+  <br>
+  <sub>Tables keep their alignment and status markers</sub>
+</div>
+
+See the <a href="#中文">Chinese section</a> for the full gallery.
 
 ### Usage
 
