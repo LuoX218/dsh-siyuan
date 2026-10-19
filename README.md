@@ -130,8 +130,9 @@
 
 右键任意消息：
 
-| 菜单项 | 同步范围 |
+| 菜单项 | 作用 |
 |---|---|
+| 复制 | 复制这条消息的纯文本（插件接管右键后补回的原生功能） |
 | 同步这条消息到思源 | 只存这一条 |
 | 同步本轮对话 | 这一轮问答 |
 | 同步整个窗口的全部对话 | 窗口里所有已加载的对话 |
@@ -302,8 +303,9 @@ See the <a href="#中文">Chinese section</a> for the full gallery.
 
 Right-click any message:
 
-| Item | Scope |
+| Item | What it does |
 |---|---|
+| Copy | Copies the message as plain text (the native action the plugin replaces) |
 | Sync this message | Just this one |
 | Sync this turn | The question-and-answer pair |
 | Sync the whole window | Everything loaded |
