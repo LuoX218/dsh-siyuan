@@ -154,20 +154,35 @@ mermaid 内置深色主题的节点背景是 `#181818`，容易和思源的自�
 
 ## 安装
 
-作为第三方插件安装：
+### 从 GitHub 克隆
 
 ```bash
-cd dsh-siyuan-sync
+git clone https://github.com/LuoX218/dsh-siyuan.git
+cd dsh-siyuan
 ./install.sh
 ```
 
-脚本会做三件事：
+`install.sh` 会做三件事：
 
 1. 软链到 `~/.dsh/profiles/desktop/node_modules/`
-2. 写入 `package.json` 的 `dependencies`
+2. 写入 profile `package.json` 的 `dependencies`
 3. 追加到 `dsh.profile.bundles`
 
 装好后在 **设置 → 插件 → 第三方插件** 里能看到 `dsh-siyuan`，可以随时启用/禁用。
+
+**国内网络**：如果 `git clone` 卡住，先设代理：
+
+```bash
+git config --global http.proxy http://127.0.0.1:7890
+```
+
+### 更新
+
+```bash
+cd dsh-siyuan
+git pull
+./uninstall.sh && ./install.sh
+```
 
 ### 卸载
 
