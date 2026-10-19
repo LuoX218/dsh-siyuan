@@ -50,7 +50,8 @@ if ($json.dependencies -and $json.dependencies.PSObject.Properties.Name -contain
     Write-Host "==> 已从 dependencies 移除"
 }
 
-if ($json.dsh -and $json.dsh.profile -and $json.dsh.profile.bundles) {
+# 同样要检查属性存在性：空数组在 PowerShell 里是假值
+if ($json.dsh -and $json.dsh.profile -and $null -ne $json.dsh.profile.PSObject.Properties["bundles"]) {
     $bundles = @($json.dsh.profile.bundles | Where-Object { $_ -ne $PkgName })
     $json.dsh.profile.bundles = $bundles
     Write-Host "==> 已从 bundles 移除"

@@ -82,11 +82,12 @@ if (-not $json.dsh) {
 if (-not $json.dsh.profile) {
     $json.dsh | Add-Member -NotePropertyName "profile" -NotePropertyValue ([PSCustomObject]@{})
 }
-if (-not $json.dsh.profile.bundles) {
+# 注意：PowerShell 里空数组是假值，必须检查属性是否存在而不是判断真假
+if ($null -eq $json.dsh.profile.PSObject.Properties["bundles"]) {
     $json.dsh.profile | Add-Member -NotePropertyName "bundles" -NotePropertyValue @()
 }
-if ($json.dsh.profile.bundles -notcontains $PkgName) {
-    $json.dsh.profile.bundles += $PkgName
+if (@($json.dsh.profile.bundles) -notcontains $PkgName) {
+    $json.dsh.profile.bundles = @($json.dsh.profile.bundles) + $PkgName
 }
 
 $json | ConvertTo-Json -Depth 20 | Set-Content $Manifest -Encoding UTF8
