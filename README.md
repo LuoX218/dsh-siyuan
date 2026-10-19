@@ -1,275 +1,254 @@
-# dsh-siyuan-sync
+# dsh-siyuan
 
-把 DeepSeek Harness 的对话，一键存入思源笔记。
+**DeepSeek Harness 对话存档插件 —— 一键把对话写进思源笔记（SiYuan）。** 支持单条消息、单轮对话、整个窗口三种粒度；思源没开时自动排队补写；公式和 mermaid 图表原样保留成思源原生块；可选调用当前模型生成结构化摘要。
 
-支持单条消息、单轮对话、整个窗口三种粒度；思源没开时自动排队；可生成 AI 摘要；公式和 mermaid 图表原样保留。
-
----
-
-## 快速开始
-
-1. 安装（见 §安装）
-2. 打开思源笔记（插件需要它的内核 API 才能写入）
-3. 在 Harness 里右键任意消息 → 选择同步方式
+[中文](#中文) · [English](#english)
 
 ---
 
-## 四种同步方式
+## 中文
 
-右键任意消息，菜单有四项：
+### 为什么需要它
 
-| 菜单项 | 同步范围 |
-| --- | --- |
-| 同步这条消息到思源 | 只存这一条 |
-| 同步本轮对话 | 这一轮（一问一答） |
-| 同步整个窗口的全部对话 | 窗口里所有已加载的对话 |
-| 思源笔记设置… | 打开控制面板 |
+Harness 里的对话跑完就散了——翻历史记录能找到，但很快被新会话淹没。真正有价值的结论、踩过的坑、改过的参数，往往过两天就找不回来。
 
-助手消息的动作条上有个「存」图标：直接点 = 同步本轮，**Shift + 点击** = 同步整个窗口。
+思源笔记适合当这个归档地：本地存储、支持双链、有全文检索。但手动复制粘贴一趟下来，格式全丢、代码块散架、公式变乱码。
 
-### 整窗口同步时的摘要选项
+这个插件把这件事变成右键一下。
 
-选「同步整个窗口」后会先问：
+### 特性
+
+- **三种同步粒度** —— 单条消息 / 本轮对话 / 整个窗口。助手消息的动作条上也挂了「存」图标，直接点存本轮，Shift+点存整窗口
+- **思源没开也不丢** —— 内容先进本地队列，每 30 秒探一次，思源启动后自动补写。队列可单独重试、删除、或一次性全补
+- **写入前可改** —— 默认弹预览面板，标题和正文都能改；不想每次点两下就在设置里关掉
+- **公式** —— 行内 `$E=mc^2$`、块级 `$$...$$` 都渲染成思源的原生公式块（`NodeMathBlock`），不是纯文本
+- **mermaid 图表** —— 流程图、时序图、状态图、甘特图、饼图、类图、思维导图，识别后交给思源渲染。DSH 用 shiki 渲染代码块，DOM 上没有语言标记，插件会从首行关键字反推（`flowchart TD` / `sequenceDiagram` / `digraph` 等 10 种）
+- **夜间模式不瞎** —— mermaid 内置深色主题的节点背景是 `#181818`，容易和思源自定义深色主题撞色。写入时注入 `theme: base` + 透明背景 + 中性线条色，白天夜间都看得清。仍有问题可在设置里换「强制深色」或「高对比」
+- **对话气泡** —— 用户消息是蓝色 NOTE callout，助手是绿色 TIP callout，颜色、图标、边框都不同，扫一眼就知道谁说的
+- **自动标签** —— 命中关键词时在正文前插 `#方案设计#`、`#问题排查#` 这类标签，方便在思源里按标签聚合。规则可在设置里改
+- **回链** —— 每段末尾标明出处：类型、会话 ID、轮次、时间
+- **重复检测** —— 写入时给块打内容指纹，再同步同样的内容会先提示「已存过」，避免堆积
+- **AI 摘要** —— 整窗口同步时可调用**你当前正在用的模型**生成归档格式的摘要（概览 / 时间线 / 主要工作 / 关键信息 / 问题与解决 / 后续），再连同全文一起写入。提示词可在设置里完全自定义
+- **失败重试** —— 指数退避 30s → 1m → 2m → 5m，最多 8 次；失败归类为 `offline` / `auth` / `missing` / `other`，面板里能直接看到原因
+- **文档失效自愈** —— 目标文档被删后，再次同步会自动清缓存重建，不会卡在 `parent block not found`
+
+如果这个插件帮到了你，欢迎给仓库点个 ⭐（[GitHub](https://github.com/LuoX218/dsh-siyuan)）。
+
+### 存放结构
+
+默认写进 `deepseek对话` 笔记本，按日期归档：
 
 ```
-同步整个窗口
-共 5 轮 · 8,432 字。可以先让 AI 生成一份摘要，
-再连同全文一起存入思源。
-
-        [取消]  [只存全文]  [提取摘要]
+deepseek对话/
+└── 2026-10-20              ← 同一天的对话追加到同一篇
+    ├── ### 01:35:00        ← 每次同步一段，以时间戳开头
+    │   ├── #方案设计#
+    │   ├── > [!NOTE] 👤 我
+    │   ├── > [!TIP] 🤖 助手
+    │   └── > 来源：...
+    ├── ### 02:10:00
+    └── ---
 ```
 
-点「提取摘要」会调用**你当前正在使用的模型**生成结构化摘要，然后连同全文一起写入。
+三级都可在设置里改：笔记本名、日期格式（`2026-10-20` / `2026/10/20` / `2026年10月20日`）、归类方式（同一天一篇 / 每次新建）。
 
-摘要用的是内置归档模板（概览 / 时间线 / 主要工作 / 关键信息 / 问题与解决 / 图片与附件 / 后续），并会按内容自动配图表。
+### 安装
 
-不想每次都被问？设置里「整窗口同步时」选「直接存全文」。
-
----
-
-## 写入思源后的样子
-
-默认存放：`deepseek对话` 笔记本 → 当天日期文档 → 每次同步一段。
-
-```markdown
-### 01:35:00
-
-#方案设计#
-
-> [!NOTE] 👤 我
->
-> 帮我加个功能
-
-> [!TIP] 🤖 助手
->
-> 好的，方案是走内核 API。
-
-> 来源：DeepSeek Harness · 本轮对话 · 会话 abcdef12 · 第 3 轮 · 2026-10-20 01:35:00
-
----
-```
-
-**角色区分**：用户是蓝色 NOTE 气泡，助手是绿色 TIP 气泡，颜色和图标都不同。
-
-**自动标签**：命中关键词时插入 `#标签#`，方便在思源里聚合检索（可在设置里关掉）。
-
-**回链**：每段末尾标明出处——类型、会话 ID、轮次、时间。
-
----
-
-## 设置项
-
-设置 → 插件 → 第三方插件 → dsh-siyuan
-
-### 存放规则
-
-| 设置项 | 可选值 | 默认 |
-| --- | --- | --- |
-| 目标笔记本 | 任意名字（不存在会自动创建） | deepseek对话 |
-| 日期格式 | `2026-10-20` / `2026/10/20` / `2026年10月20日` | dash |
-| 归类方式 | 同一天追加一篇 / 每次新建文档 | 同一天追加 |
-| 每段时间标题 | 不添加 / 二级 / 三级 / 四级 | 三级 |
-
-### 排版
-
-| 设置项 | 可选值 | 默认 |
-| --- | --- | --- |
-| 段落之间的分隔线 | 显示 / 不显示 | 显示 |
-| 每段显示时间戳 | 显示 / 不显示 | 显示 |
-| 流程图 / 图表配色 | 跟随思源 / 强制浅色 / 强制深色 / 高对比 | 跟随思源 |
-| 自动标签 | 开 / 关 | 开 |
-
-### 摘要
-
-| 设置项 | 说明 |
-| --- | --- |
-| 整窗口同步时 | 先问是否提取摘要 / 直接存全文 |
-| 提取摘要的提示词 | 可完全自定义；留空 = 用内置模板 |
-
-### 行为
-
-| 设置项 | 说明 | 默认 |
-| --- | --- | --- |
-| 写入前预览 | 先弹面板可改标题和正文 | 开 |
-| 重复内容提醒 | 已存过的内容给出提示 | 开 |
-
----
-
-## 队列
-
-思源没开时，内容写进本地队列（`~/.dsh/plugin-data/dsh-siyuan-sync/queue/`），每 30 秒检测一次，思源一启动就自动补写。
-
-设置面板里的队列管理：
-
-- 每条显示：标题、字数、相对时间、重试次数、失败原因
-- **重试**：单独补写这一条
-- **删除**：不要了
-- **立即写入 N 条**：全部一起补
-
-**失败重试**：指数退避 30s → 1m → 2m → 5m（封顶），最多 8 次。
-
-**失败归类**：`offline`（思源没开）/ `auth`（凭据失效）/ `missing`（文档丢失，会自动重建）/ `other`
-
----
-
-## 支持的内容
-
-| 元素 | 说明 |
-| --- | --- |
-| 公式 | 行内 `$E=mc^2$`、块级 `$$...$$`，渲染成思源原生公式块 |
-| mermaid 图表 | flowchart / sequenceDiagram / stateDiagram / gantt / pie / classDiagram / mindmap |
-| 代码块 | 按语言高亮，语言标记自动识别（即使 DSH 没给） |
-| 表格、列表、任务列表、引用 | 保留原始结构 |
-| 图片 | 对话中提到的截图会记录文件名和作用 |
-
-### 关于夜间模式
-
-mermaid 内置深色主题的节点背景是 `#181818`，容易和思源的自定义深色主题撞色导致「看不见」。
-
-插件写入时注入 `theme: base` + 透明背景 + 中性线条色，白天夜间都清晰。
-
-如果仍然看不清，设置里换成「强制深色」或「高对比」。
-
----
-
-## 安装
-
-### 从 GitHub 克隆
-
-```bash
+```sh
 git clone https://github.com/LuoX218/dsh-siyuan.git
 cd dsh-siyuan
 ./install.sh
 ```
 
-`install.sh` 会做三件事：
+`install.sh` 做三件事：
 
 1. 软链到 `~/.dsh/profiles/desktop/node_modules/`
 2. 写入 profile `package.json` 的 `dependencies`
 3. 追加到 `dsh.profile.bundles`
 
-装好后在 **设置 → 插件 → 第三方插件** 里能看到 `dsh-siyuan`，可以随时启用/禁用。
+装完重启 Harness，在 **设置 → 插件 → 第三方插件** 里能看到 `dsh-siyuan`，可随时启用/停用。
 
-**国内网络**：如果 `git clone` 卡住，先设代理：
+> 国内网络 clone 卡住的话，先给 git 设代理：`git config --global http.proxy http://127.0.0.1:7890`
 
-```bash
-git config --global http.proxy http://127.0.0.1:7890
-```
+### 思源侧准备
 
-### 更新
-
-```bash
-cd dsh-siyuan
-git pull
-./uninstall.sh && ./install.sh
-```
-
-### 卸载
-
-```bash
-./uninstall.sh
-```
-
----
-
-## 思源侧准备
-
-插件需要思源内核 API 的 token，会自动从这些位置读取：
+插件需要思源内核 API 的 token，会自动从这些位置读：
 
 - `~/Library/Application Support/SiYuan/conf/conf.json`（macOS）
 - `%APPDATA%/SiYuan/conf/conf.json`（Windows）
 - `~/.config/siyuan/conf/conf.json`（Linux）
 
-也可以设 `SIYUAN_WORKSPACE` 环境变量指向自定义工作空间。
+自定义工作空间可以设环境变量 `SIYUAN_WORKSPACE`。
 
-**思源必须开着**——写入只能走它的 API。
+**思源必须开着才能写入** —— 内核 API 是唯一可用的写入通道。
 
----
+### 使用
 
-## 为什么只走内核 API
+#### 右键菜单
 
-思源官方明确要求：**外部程序不要直接读写 `<workspace>/data` 目录**，否则可能导致云同步分块丢失或数据损坏。
+任意消息右键，四项：
+
+| 菜单项 | 同步范围 |
+|---|---|
+| 同步这条消息到思源 | 只存这一条 |
+| 同步本轮对话 | 这一轮（一问一答） |
+| 同步整个窗口的全部对话 | 窗口里所有已加载的对话 |
+| 思源笔记设置… | 打开控制面板 |
+
+#### 整窗口 + 摘要
+
+选「同步整个窗口」后先弹选择框：
+
+```
+同步整个窗口
+共 5 轮 · 8,432 字。可以先让 AI 生成一份摘要，再连同全文一起存入思源。
+
+        [取消]  [只存全文]  [提取摘要]
+```
+
+点「提取摘要」会调用当前会话正在用的模型（走 `ctx.agentDefaultModel`），生成结构化的归档纪要。用的是内置模板：
+
+| 章节 | 内容 |
+|---|---|
+| 概览 | 任务是什么、最终状态、关键结论 |
+| 时间线 | 节点列表 + **强制配 gantt 图** |
+| 主要工作 | 改了什么 / 为什么改 / 改成什么样，含 `路径:行号` |
+| 关键信息 | 表格：路径、参数、版本、错误原文 |
+| 问题与解决 | 现象 → 根因 → 解法 |
+| 图片与附件 | 截图和文件的内容与作用 |
+| 后续 | 未完成、待验证、已知风险 |
+
+模板要求关键结论打证据标记：`[已确认]` / `[推断]` / `[未验证]`，并要求把方案的推翻过程写出来（旧方案 → 为什么改 → 新方案），而不是只记最终版。
+
+图表按内容类型自动选：流程用 flowchart、时间线用 gantt、占比用 pie、模块关系用 classDiagram，最多 1-3 张。
+
+不想要摘要？设置里「整窗口同步时」选「直接存全文」。
+
+#### 设置项
+
+**设置 → 插件 → 第三方插件 → dsh-siyuan**，共 16 项：
+
+存放规则：目标笔记本、日期格式、归类方式、每段时间标题级别
+排版：段落分隔线、时间戳、图表配色、自动标签
+摘要：是否先问摘要、摘要提示词
+行为：写入前预览、重复内容提醒
+
+#### 队列
+
+思源没开时内容落到 `~/.dsh/plugin-data/dsh-siyuan-sync/queue/`。设置面板里能看到每一条的标题、字数、相对时间、重试次数和失败原因，可以单独重试或删除，也可以「立即写入 N 条」一起补。
+
+### 为什么不直接写文件
+
+思源官方明确要求：外部程序不要直接读写 `<workspace>/data` 目录，否则可能导致云同步分块丢失或数据损坏。
 
 所以插件：
 
-- ✅ 通过 `/api/block/appendBlock` 等接口写入
-- ✅ 只读取 `conf/conf.json` 拿 token（只读，不改）
-- ❌ 从不直接操作 `data/` 下的文件
+- 通过 `/api/block/appendBlock`、`/api/filetree/createDocWithMd` 等接口写入
+- 只**读** `conf/conf.json` 拿 token，不改任何文件
+- 从不碰 `data/` 下的东西
 
-早期版本试过直接生成 `.sy` 文件，结果触发了思源的解析错误（`ListData.Typ` 类型不匹配），已彻底移除该路径。
+早期版本试过直接生成 `.sy` 文件，结果触发思源的解析错误（`ListData.Typ` 类型不匹配），已彻底移除。
 
----
+### 已知限制
 
-## 端点
+| 限制 | 原因 |
+|---|---|
+| 思源必须运行才能写入 | 写入只能走内核 API |
+| 思维导图不能直接生成 | 思源的脑图是原生块（`NodeMindmapItem`），只能从列表右键「转换为脑图」 |
+| 已有内容不会自动更新 | 改了排版设置只影响新同步的内容 |
+| 摘要依赖当前模型 | 会话没选模型时拿不到 `agentDefaultModel` |
 
-插件在 Host 端注册了 7 个接口（前缀 `/plugins/dsh-siyuan-sync`）：
+### 验证
 
-| 端点 | 方法 | 作用 |
-| --- | --- | --- |
-| `/config` | GET / POST | 读写配置 |
-| `/notebooks` | GET | 笔记本列表（`?refresh=1` 强制重新探测） |
-| `/ping` | GET | 连通性检测 |
-| `/queue` | POST | 队列操作（flush / clear / remove / retry） |
-| `/summary` | POST | 调用当前模型生成摘要 |
-| `/check` | POST | 查内容是否已存过 |
-| `/sync` | POST | 执行同步 |
-
----
-
-## 文件结构
-
-```
-dsh-siyuan-sync/
-├── lib/
-│   ├── index.js        Host 半部分：配置、思源 API、队列、摘要、路由
-│   └── client.js       Client 半部分：右键菜单、预览、设置面板
-├── scripts/            19 份验证脚本
-├── cordis.patch.yml    插件加载补丁
-├── install.sh          安装脚本
-├── uninstall.sh        卸载脚本
-└── README.md
-```
-
----
-
-## 验证
-
-```bash
+```sh
 E="/Applications/DeepSeek Harness.app/Contents/MacOS/DeepSeek Harness"
 for f in scripts/verify-*.mjs; do
   ELECTRON_RUN_AS_NODE=1 "$E" "$f" && echo "OK $f"
 done
 ```
 
-19 份测试覆盖：窗口序列化、Markdown 转换、插件面板、队列、UI 样式、公式、图表、语言嗅探、Shiki DOM、换行保留、主题注入、失效文档恢复、功能 1-5、提示词配置、角色气泡。
+18 份脚本覆盖：窗口序列化、Markdown 转换、插件面板、队列、UI 样式、公式、图表、语言嗅探、Shiki DOM、换行保留、主题注入、失效文档恢复、提示词配置、角色气泡。
+
+### License
+
+MIT
 
 ---
 
-## 已知限制
+## English
 
-| 限制 | 原因 |
-| --- | --- |
-| 思源必须运行才能写入 | 写入只能走内核 API |
-| 思维导图不能直接生成 | 思源的脑图是原生块，只能从列表右键转换 |
-| 已有内容不会自动更新 | 改了排版设置只影响新同步的内容 |
-| 摘要依赖当前模型 | 会话没选模型时无法生成 |
+**Archive DeepSeek Harness conversations into SiYuan Notes with one right click.** Three sync scopes (single message / current turn / whole window), offline queue that flushes when SiYuan comes up, formulas and mermaid diagrams preserved as native SiYuan blocks, optional AI summary generated by your current model.
+
+### Why
+
+Harness conversations scatter once they end. The conclusions, the bugs you hit, the parameters you tuned — all of it gets buried under new sessions within days.
+
+SiYuan is a good home for that archive: local storage, backlinks, full-text search. But copying by hand loses formatting, breaks code fences, and mangles formulas.
+
+This plugin turns it into a right-click.
+
+### Features
+
+- **Three sync scopes** — single message / current turn / whole window. Assistant rows also carry a "save" icon: click for current turn, Shift+click for the whole window
+- **No data loss when SiYuan is down** — content goes to a local queue, probed every 30s, flushed automatically once SiYuan starts. Entries can be retried, deleted, or flushed all at once
+- **Preview before write** — an editable panel by default; turn it off in settings if you don't want the extra click
+- **Formulas** — inline `$E=mc^2$` and block `$$...$$` both become native SiYuan math blocks (`NodeMathBlock`), not plain text
+- **mermaid diagrams** — flowchart, sequence, state, gantt, pie, class, mindmap. DSH highlights code via shiki, which puts no language marker in the DOM, so the plugin infers it from the first line (`flowchart TD`, `sequenceDiagram`, `digraph`, 10 patterns total)
+- **Readable in dark mode** — mermaid's built-in dark theme uses `#181818` node backgrounds, which collide with custom SiYuan dark themes. The plugin injects `theme: base` with transparent backgrounds and neutral line colors. Force dark or high contrast available in settings
+- **Speaker bubbles** — user messages are blue NOTE callouts, assistant messages green TIP callouts. Different color, icon, and border
+- **Auto tags** — inserts `#tag#` before the body when keywords match (`#design#`, `#troubleshooting#`), so you can aggregate by tag in SiYuan. Rules are editable
+- **Backlink** — each segment ends with its origin: kind, session ID, turn, timestamp
+- **Duplicate detection** — content fingerprints on written blocks; syncing the same content again prompts "already saved"
+- **AI summary** — for whole-window syncs, calls **the model you're currently using** to produce an archival-format summary (overview / timeline / work log / key facts / problems & fixes / follow-ups), then writes it together with the transcript. Prompt fully customizable in settings
+- **Retry with backoff** — 30s → 1m → 2m → 5m, max 8 attempts; failures classified as `offline` / `auth` / `missing` / `other`
+- **Self-healing documents** — if the target doc was deleted, the next sync clears the cache and recreates it instead of failing with `parent block not found`
+
+### Install
+
+```sh
+git clone https://github.com/LuoX218/dsh-siyuan.git
+cd dsh-siyuan
+./install.sh
+```
+
+`install.sh` symlinks the plugin into `~/.dsh/profiles/desktop/node_modules/`, adds it to the profile's `dependencies`, and appends it to `dsh.profile.bundles`.
+
+Restart Harness afterwards. The plugin appears under **Settings → Plugins → Third-party plugins** as `dsh-siyuan`.
+
+### SiYuan side
+
+The plugin reads the kernel API token from `conf/conf.json` automatically (macOS / Windows / Linux paths covered). Set `SIYUAN_WORKSPACE` for a custom workspace.
+
+**SiYuan must be running** — the kernel API is the only supported write path.
+
+### Usage
+
+Right-click any message:
+
+| Item | Scope |
+|---|---|
+| Sync this message | Just this one |
+| Sync this turn | The question-and-answer pair |
+| Sync the whole window | Everything loaded in the window |
+| SiYuan settings… | Open the control panel |
+
+Whole-window syncs offer an optional AI summary before writing. The built-in template produces: overview, timeline (with a mandatory gantt chart), work log with `path:line` references, a key-facts table, problem → root cause → fix, image/attachment notes, and follow-ups. Key conclusions are tagged `[confirmed]` / `[inferred]` / `[unverified]`, and superseded approaches are recorded rather than erased.
+
+### Why not write files directly
+
+SiYuan's own guidance forbids external programs from touching `<workspace>/data` — it risks sync-chunk loss or corruption. The plugin therefore writes only through kernel APIs, reads `conf/conf.json` read-only, and never touches `data/`.
+
+An early version did generate `.sy` files directly; it triggered SiYuan parse errors (`ListData.Typ` mismatch) and was removed.
+
+### Known limitations
+
+| Limitation | Reason |
+|---|---|
+| SiYuan must be running | Kernel API is the only write path |
+| No direct mindmap generation | SiYuan mindmaps are native blocks (`NodeMindmapItem`); convert from a list manually |
+| Existing content isn't updated | Layout changes only affect new syncs |
+| Summary needs a selected model | Uses `agentDefaultModel` from the current session |
+
+### License
+
+MIT
